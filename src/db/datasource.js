@@ -1,6 +1,6 @@
 
 import Swal from 'sweetalert2'
-export const API_URL="http://localhost:4200/";
+export const API_URL=process.env.REACT_APP_BACKEND_API
 //Users
 export const getUsers = async () => {
     const token = localStorage.getItem('token');
