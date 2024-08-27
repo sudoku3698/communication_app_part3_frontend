@@ -28,7 +28,6 @@ function Login() {
             return
         }
         loginUser({ email, password }).then((response) => {
-            console.log(response)
             if (response.status === 200) {
                 setToken(response?.data?.token)
                 navigate('/login_success')

@@ -16,8 +16,12 @@ export default function Users() {
   useEffect(() => {
     getUsers().then((data) => {
       setUsers(data)
+    }).catch((error) => {
+      if (error.response.status === 403) {
+        setUsers([])
+      }
     })
-  }, [])
+  }, [loggedInUser])
 
   const [show, setShow] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
@@ -156,7 +160,7 @@ export default function Users() {
         </tr>
       </thead>
       <tbody>
-        {users.map((user, index) => (
+        {users && users.map((user, index) => (
           <tr key={index}>
             <td>{user.name}</td>
             <td>{user.email}</td>

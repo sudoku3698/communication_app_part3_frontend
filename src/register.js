@@ -62,7 +62,6 @@ function Register() {
     }
     const response = await registerUser(user)
     if (response?.status && response?.status === 200) {
-      console.log(response);
       setName('')
       setEmail('')
       setPassword('')

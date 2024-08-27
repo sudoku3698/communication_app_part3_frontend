@@ -1,3 +1,5 @@
+
+import Swal from 'sweetalert2'
 export const API_URL="http://localhost:4200/";
 //Users
 export const getUsers = async () => {
@@ -10,10 +12,14 @@ export const getUsers = async () => {
     };
     try {
         const response = await fetch(`${API_URL}users`, config);
+        console.log(response.status)
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+            return;
+        }
         return await response.json();
     } catch (error) {
-        console.error('Error:', error);
-        throw error;
+        
     }
 }
 
@@ -30,10 +36,12 @@ export const deleteUser=async (id) => {
             method: 'DELETE',
             ...config,
         });
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+        }
         return await response.json();
     } catch (error) {
-        console.error('Error:', error);
-        throw error;
+        
     }
 }
 
@@ -51,10 +59,12 @@ export const updateUser=async (user,id) => {
             ...config,
             body: JSON.stringify(user),
         });
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+        }
         return await response.json();
     } catch (error) {
-        console.error('Error:', error);
-        throw error;
+        
     }
 }
 
@@ -76,8 +86,7 @@ export const registerUser=async (user) => {
         const data = await response.json();
         return {data, status: response.status};
     } catch (error) {
-        console.error('Error:', error);
-        throw error;
+        
     }
 }
 
@@ -93,20 +102,51 @@ export const loginUser = async (user) => {
     return {data, status: response.status};
 }
 
-export const setDBUsers = (users) => {
-    localStorage.setItem('users', JSON.stringify(users))
-}
-
 
 
 //Chats
-export const getChats = () => {
-    const chats = JSON.parse(localStorage.getItem('chats')) || []
-    return chats
+export const getChats = async () => {
+    const token = getToken();
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+    };
+    try {
+        const response = await fetch(`${API_URL}chats`, config);
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        
+    }
 }
 
-export const setDbChats = (chats) => {
-    localStorage.setItem('chats', JSON.stringify(chats))
+export const createChat = async (chats) => {
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+    };
+    try {
+        const response = await fetch(`${API_URL}chats`, {
+            method: 'POST',
+            ...config,
+            body: JSON.stringify(chats),
+        });
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+        }
+        const data = await response.json();
+        return {data, status: response.status};
+    } catch (error) {
+        
+    }
 }
 export const title="Document";
 
@@ -119,41 +159,80 @@ export const getDocuments = async () => {
             Authorization: `Bearer ${token}`,
         },
     };
-    const response = await fetch(`${API_URL}uploads`, config);
-    const data = await response.json();
-    return data;
+    try {
+        const response = await fetch(`${API_URL}uploads`, config);
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        
+    }
 }
-export const updateDocument = async (document) => {
+export const updateDocument = async (id,inputs) => {
     const formData = new FormData();
-    formData.append('filetoupdate', document.fileToUpload);
-    formData.append('label', document.label);
-
-    const response = await fetch(`${API_URL}uploads/${document.id}`, {
-        method: 'PATCH',
-        body: formData,
+    Object.keys(inputs).forEach(key => {
+        if(key === 'label'){
+            formData.append('label', inputs[key]);
+        }else if(key === 'filename'){
+            formData.append('filetoupload', inputs[key][0]);
+        }
     });
-    const data = await response.json();
-    return {data, status: response.status};
-}
 
-export const addDocument = async (document) => {
-    const formData = new FormData();
-    formData.append('file', document.fileToUpload);
-    formData.append('label', document.label);
     const token = getToken();
     const config = {
         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`
         },
     };
-    const response = await fetch(`${API_URL}uploads`, {
-        method: 'POST',
-        ...config,
-        body: formData,
+    
+    try {
+        const response = await fetch(`${API_URL}uploads/${id}`, {
+            method: 'PUT',
+            ...config,
+            body: formData,
+        });
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+        }
+        const data = await response.json();
+        return {data, status: response.status};
+    } catch (error) {
+        
+    }
+}
+
+export const addDocument = async (inputs) => {
+    const formData = new FormData();
+    Object.keys(inputs).forEach(key => {
+        if(key === 'label'){
+            formData.append('label', inputs[key]);
+        }else if(key === 'filename'){
+            formData.append('filetoupload', inputs[key][0]);
+        }
     });
-    const data = await response.json();
-    return {data, status: response.status};
+    
+    
+    const token = getToken();
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+    };
+    try {
+        const response = await fetch(`${API_URL}uploads`, {
+            method: 'POST',
+            ...config,
+            body: formData,
+        });
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+        }
+        const data = await response.json();
+        return {data, status: response.status};
+    } catch (error) {
+    }
 
 }
 
@@ -165,12 +244,19 @@ export const deleteDocument = async (id) => {
             Authorization: `Bearer ${token}`,
         },
     };
-    const response = await fetch(`${API_URL}uploads/${id}`, {
-        method: 'DELETE',
-        ...config,
-    });
-    const data = await response.json();
-    return {data, status: response.status};
+    try {
+        const response = await fetch(`${API_URL}uploads/${id}`, {
+            method: 'DELETE',
+            ...config,
+        });
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+        }
+        const data = await response.json();
+        return {data, status: response.status};
+    } catch (error) {
+        
+    }
 }
 
 
@@ -187,8 +273,15 @@ export const getLoggedInUser = async () => {
             Authorization: `Bearer ${token}`,
         },
     };
-    const response = await fetch(`${API_URL}get_auth_user`, config);
-    return await response.json()
+    try {
+        const response = await fetch(`${API_URL}get_auth_user`, config);
+        if (response.status === 403 || response.status===401) {
+            checkForbidden();
+        }
+        return await response.json()
+    } catch (error) {
+        
+    }
 }
 export const setToken = (token) => {
     localStorage.setItem('token', token)
@@ -198,4 +291,20 @@ export const setToken = (token) => {
 export const deleteLoggedInUser = () => {
     localStorage.removeItem('token')
     return null
+}
+
+const checkForbidden = () => {
+        deleteLoggedInUser()
+        Swal.fire({
+            title: 'Session Expired',
+            text: 'Your session has expired, please login again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/login'
+            }
+        })
+        
+
 }
