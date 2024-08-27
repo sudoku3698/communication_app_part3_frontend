@@ -1,9 +1,10 @@
 import React from 'react'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useNavigate,useLocation } from 'react-router-dom'
 import { deleteLoggedInUser } from './db/datasource';
 
 export default function Nav() {
     const navigate = useNavigate();
+    const location = useLocation();
     function logout() {
         deleteLoggedInUser()
         navigate('/login')
@@ -18,16 +19,16 @@ export default function Nav() {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav">
                         <li className="nav-item">
-                            <Link className="nav-link" to="/">Home</Link>
+                            <Link className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} to="/">Home</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/chats">Chats</Link>
+                            <Link className={`nav-link ${location.pathname === '/chats' ? 'active' : ''}`} to="/chats">Chats</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/users">Users</Link>
+                            <Link className={`nav-link ${location.pathname === '/users' ? 'active' : ''}`} to="/users">Users</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/documents">Documents</Link>
+                            <Link className={`nav-link ${location.pathname === '/documents' ? 'active' : ''}`} to="/documents">Documents</Link>
                         </li>
                         <li className="nav-item">
                             <button className="nav-link btn btn-link" onClick={logout}>Logout</button>
