@@ -14,13 +14,15 @@ export default function Users() {
   }, [])
 
   useEffect(() => {
-    getUsers().then((data) => {
-      setUsers(data)
-    }).catch((error) => {
-      if (error.response.status === 403) {
-        setUsers([])
-      }
-    })
+    if(loggedInUser){
+      getUsers().then((data) => {
+        setUsers(data)
+      }).catch((error) => {
+        if (error.response.status === 403) {
+          setUsers([])
+        }
+      })
+    }
   }, [loggedInUser])
 
   const [show, setShow] = useState(false);
