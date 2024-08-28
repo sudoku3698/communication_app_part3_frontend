@@ -141,7 +141,7 @@ export default function Documents() {
         const newDocument = {
           label: inputs.label,
           filename: response?.data?.filename || inputs.filename,
-          id: response.data.id
+          id: response.data?.data?.id
         };
         setDocuments([...documents, newDocument]);
       });
