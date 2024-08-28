@@ -54,7 +54,7 @@ export default function Chats() {
                   element.scrollTop = element.scrollHeight;
                 }
               }}>
-                {chats &&chats.map((chat, index) => (
+                {chats && chats.map((chat, index) => (
                   <li key={index} className="p-2">
                     <div className={`align-items-center d-flex mb-3 ${chat.username === loggedInUser.name ? 'justify-content-end' : ''}`}>
                       <div className={`d-flex flex-column bg-light col-md-8 ${chat.username === loggedInUser.name ? 'border border-primary rounded-end' : 'border border-secondary rounded-start'}`}>

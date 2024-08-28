@@ -193,10 +193,10 @@ export default function Documents() {
           </tr>
         </thead>
         <tbody>
-          {documents &&documents.map((document, index) => (
+          {documents && documents.map((document, index) => (
             <tr key={index}>
               <td>{document.label}</td>
-              <td><a href={`${API_URL}${document.filename}`} download target="_blank" rel="noopener noreferrer">Download</a></td>
+              <td><a href={`${API_URL}download?filename=${encodeURIComponent(document.filename)}`} download="download" target="_blank" rel="noopener noreferrer">Download</a></td>
               <td>
                 <Button variant="primary" onClick={() => handleEdit(index)}>
                   Edit
